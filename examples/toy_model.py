@@ -18,7 +18,7 @@ import re
 import pyqtgraph.exporters
 from cnmodel.util import pyqtgraphPlotHelpers as PH
 from cnmodel.protocols import IVCurve
-
+import timeit
 
 try:  # check for pyqtgraph install
     import pyqtgraph as pg
@@ -184,6 +184,8 @@ class Toy(Protocol):
         labelStyle = {'color': '#000', 'font-size': '9pt', 'weight': 'normal'}
         tickStyle = QtGui.QFont('Arial', 9, QtGui.QFont.Light)
         self.iv = IVCurve()  # use standard IVCurve here...
+        run_times = {}
+        allrunstart = timeit.default_timer()
         for n, name in enumerate(self.celltypes.keys()):
             nrn_cell = netcells[name]  # get the Neuron object we are using for this cell class
             injcmds = list(self.celltypes[name][3])  # list of injections
@@ -202,8 +204,13 @@ class Toy(Protocol):
                 self.win.nextRow()
                 row += 1
             self.iv.reset()
+            start_time = timeit.default_timer()
             self.iv.run({'pulse': [injcmds]}, nrn_cell, durs=(stim['delay'], stim['dur'], 20.),
                    sites=None, reppulse=None, temp=float(temperature))
+            # get time of run before display
+            elapsed = timeit.default_timer() - start_time
+            run_times[name] = elapsed
+            
             for k in range(len(self.iv.voltage_traces)):
                 pl[name].plot(self.iv.time_values, self.iv.voltage_traces[k], pen=pg.mkPen('k', width=0.75))
             pl[name].setRange(xRange=(0., 130.), yRange=(-160., 40.))
@@ -215,6 +222,12 @@ class Toy(Protocol):
             ti.setPos(120., -120.)
             pl[name].addItem(ti)
         # get overall Rin, etc; need to initialize all cells
+        allruntime = timeit.default_timer() - allrunstart
+        t_each_total = 0
+        for n, name in enumerate(self.celltypes.keys()):
+            print('   Cell {0:16s}  Runtime for IV: {1:8.3f}s'.format(name, run_times[name]))
+            t_each_total = t_each_total + run_times[name]
+        print('   All runs: {0:8.3f}s  Cumulative time: {1:8.3f}s'.format(allruntime, t_each_total))
         nrn_cell.cell_initialize()
         for n, name in enumerate(self.celltypes.keys()):
             nrn_cell = netcells[name]
@@ -222,6 +235,7 @@ class Toy(Protocol):
             pars = nrn_cell.compute_rmrintau(auto_initialize=False)
             print(u'{0:>14s} [{1:>24s}]   *** Rin = {2:6.1f} M\u03A9  \u03C4 = {3:6.1f} ms   Vm = {4:6.1f} mV'.
                 format(nrn_cell.status['name'], name, pars['Rin'], pars['tau'], pars['v']))
+        
 
 
 if __name__ == "__main__":

@@ -13,6 +13,7 @@ cells_per_band).
 """
 
 import os, sys, time
+import pickle
 from collections import OrderedDict
 import numpy as np
 import scipy.stats
@@ -24,6 +25,7 @@ from cnmodel import populations
 from cnmodel.util import sound, random
 from cnmodel.protocols import Protocol
 import timeit
+import datetime
 
 
 class CNSoundStim(Protocol):
@@ -60,7 +62,7 @@ class CNSoundStim(Protocol):
 
         # Select cells to record from.
         # At this time, we actually instantiate the selected cells.
-        # Select 4 cells centered around 16kHz
+        # Select 3 cells centered around 16kHz
         frequencies = [16e3]
         cells_per_band = 3
         for f in frequencies:
@@ -183,8 +185,14 @@ class NetworkSimDisplay(pg.QtGui.QSplitter):
         self.tuning_img = pg.ImageItem()
         self.tuning_plot.addItem(self.tuning_img)
         
-        df = np.log10(self.freqs[1]) - np.log10(self.freqs[0])
-        dl = self.levels[1] - self.levels[0]
+        if len(self.freqs) > 1:
+            df = np.log10(self.freqs[1]) - np.log10(self.freqs[0])
+        else:
+            df = 1e3
+        if len(self.levels) > 1:
+            dl = self.levels[1] - self.levels[0]
+        else:
+            dl = 10  
         self.stim_rect = QtGui.QGraphicsRectItem(QtCore.QRectF(0, 0, df, dl))
         self.stim_rect.setPen(pg.mkPen('c'))
         self.stim_rect.setZValue(20)
@@ -323,7 +331,6 @@ class NetworkSimDisplay(pg.QtGui.QSplitter):
         pop, ind = self.selected_cell
         fvals = set()
         lvals = set()
-        
         # first get lists of all frequencies and levels in the matrix
         for stim, vec in self.results.values():
             fvals.add(stim.key()['f0'])
@@ -356,6 +363,15 @@ class NetworkSimDisplay(pg.QtGui.QSplitter):
         self.tuning_img.setPos(np.log10(min(fvals)), min(lvals))
         self.tuning_img.scale((np.log10(max(fvals)) - np.log10(min(fvals))) / (len(fvals) - 1), 
                               (max(lvals) - min(lvals)) / (len(lvals) - 1))
+        self.tuning_yscale = (max(lvals) - min(lvals)) / (len(lvals) - 1)
+        self.tuning_xscale = (np.log10(max(fvals)) - np.log10(min(fvals))) / (len(fvals) - 1)
+        self.lvals = lvals
+        self.fvals = fvals
+        self.matrix = matrix
+
+        print ('pop, ind : ', pop, ind)
+        print(nd.matrix)
+        print(nd.lvals, nd.fvals)
         
 
 
@@ -490,12 +506,7 @@ class NetworkVisualizer(pg.PlotWidget):
         
         self.cell_selected.emit(self, selected.data())
 
-
-if __name__ == '__main__':
-    import pickle, os, sys
-    app = pg.mkQApp()
-    pg.dbg()
-    
+def one_map(seed):
     # Create a sound stimulus and use it to generate spike trains for the SGC
     # population
     stims = []
@@ -503,31 +514,29 @@ if __name__ == '__main__':
     fmin = 4e3
     fmax = 32e3
     octavespacing = 1/3.
-#    octavespacing = 1.
+   # octavespacing = 1.
     n_frequencies = int(np.log2(fmax/fmin) / octavespacing) + 1
     fvals = np.logspace(np.log2(fmin/1000.), np.log2(fmax/1000.), num=n_frequencies, endpoint=True, base=2)*1000.
-    
+   # fvals = np.array([8e3,16e3,24e3])
     n_levels = 9
-#    n_levels = 3
+   # n_levels = 2
     levels = np.linspace(20, 100, n_levels)
     
     print("Frequencies:", fvals/1000.)
     print("Levels:", levels)
 
-    syntype = 'simple'
+    syntype = 'multisite'
     path = os.path.dirname(__file__)
     cachepath = os.path.join(path, 'cache')
     if not os.path.isdir(cachepath):
         os.mkdir(cachepath)
 
-    seed = 34657845
     prot = CNSoundStim(seed=seed, synapsetype=syntype)
     i = 0
-    
+    resultfile = 'testPhys_%s_%s.p' % (seed, datetime.datetime.now().strftime("%Y.%d.%m_%H%M")) 
     start_time = timeit.default_timer()
     
     #stimpar = {'dur': 0.06, 'pip': 0.025, 'start': [0.02], 'baseline': [10, 20], 'response': [20, 45]}
-    stimpar = {'dur': 0.2, 'pip': 0.04, 'start': [0.1], 'baseline': [50, 100], 'response': [100, 140]}
     tasks = []
     for f in fvals:
         for db in levels:
@@ -573,9 +582,66 @@ if __name__ == '__main__':
     # get time of run before display
     elapsed = timeit.default_timer() - start_time
     print 'Elapsed time for %d stimuli: %f  (%f sec per stim), synapses: %s' % (len(tasks), elapsed, elapsed/len(tasks), prot.bushy._synapsetype)
+
+    # write results to disk
+    #res = [(results[i][0].__dict__, results[i][1]) for i in range(len(results))]
+    #print res
+    #print prot.__dict__
+    testdata = {'results': results, 'stimpar': stimpar, 'synapsetype': syntype, 'seed': seed, 'stim': [fvals, levels]}
+    pickle.dump(testdata, open(resultfile, 'wb'))
+    return prot, results
+
+
+if __name__ == '__main__':
+    plotMap = True
+    retrievedata = False
+    if '--noplot' in sys.argv[1:]:
+        plotMap = False
+    if '--retrieve' in sys.argv[1:]:
+        retrievedata = True
+
+    stimpar = {'dur': 0.2, 'pip': 0.04, 'start': [0.1], 'baseline': [50, 100], 'response': [100, 140]}
     
-    nd = NetworkSimDisplay(prot, results, baseline=stimpar['baseline'], response=stimpar['response'])
-    nd.show()
-    
-    if sys.flags.interactive == 0:
-        pg.QtGui.QApplication.exec_()
+    app = pg.mkQApp()
+    pg.dbg()
+    seed = 34657845
+    nrep = 1
+    if not retrievedata and nrep == 1:
+        prot, results = one_map(seed)
+    if not retrievedata and nrep > 1:
+        for i in range(nrep):
+            prot, results = one_map(seed+i)
+    if retrievedata:
+        filedialog = QtGui.QFileDialog()
+        filedialog.setFileMode(QtGui.QFileDialog.ExistingFile)
+        filename = str(filedialog.getOpenFileName(None, "Select file", '.',
+                                    '*.p'))
+        if filename == '':
+            exit(1)
+        fdata = pickle.load(open(filename, 'rb'))
+        stimpar = fdata['stimpar']
+        results = fdata['results']
+        seed = fdata['seed']
+        syntype = fdata['synapsetype']
+        for m in range(len(results)):
+            for k in results[m][1].keys():  # find the bushy cells in the model
+                fr = results[m][0].opts['f0']
+                lv = results[m][0].opts['dbspl']
+                if k[0] == 'bushy':
+                    st = results[m][1][k][1]
+                    print ('fr: %f  dB: %f' % (fr, lv)),
+                    print ('spks: ', st)
+        exit(1)
+
+        # to recreate, need to do this...
+        #prot = CNSoundStim(seed=seed, synapsetype=syntype)
+        # stim = sound.TonePip(rate=100e3, duration=stimpar['dur'], f0=f, dbspl=db,  # dura 0.2, pip_start 0.1 pipdur 0.04
+        #                                  ramp_duration=2.5e-3, pip_duration=stimpar['pip'],
+        #                                  pip_start=stimpar['start'])
+    if plotMap:
+        nd = NetworkSimDisplay(prot, results, baseline=stimpar['baseline'], response=stimpar['response'])
+        nd.show()
+
+        
+        if sys.flags.interactive == 0:
+            pg.QtGui.QApplication.exec_()
