@@ -25,7 +25,7 @@ function [] = testANModel()
     pin = sqrt(2)*20e-6*10^(stimdb/20)*sin(2*pi*F0*t); % unramped stimulus
     pin(1:irpts)= pin(1:irpts).*(0:(irpts-1))/irpts; 
     pin((mxpts-irpts):mxpts)=pin((mxpts-irpts):mxpts).*(irpts:-1:0)/irpts;
-    length(pin)
+
     vihc = model_IHC(pin,CF,nrep,1/Fs,T*2,cohc,cihc,species); 
     [meanrate,varrate,psth] = model_Synapse(vihc,CF,nrep,1/Fs,fiberType,noiseType,implnt); 
 

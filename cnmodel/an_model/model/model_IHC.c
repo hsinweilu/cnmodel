@@ -60,8 +60,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	
 	double *px, cf, tdres, reptime, cohc, cihc;
-	long    nrep, pxbins, lp, outsize[2], totalstim, species;
-
+	int    nrep, pxbins, lp, totalstim, species;
+    size_t outsize[2];
 	double *pxtmp, *cftmp, *nreptmp, *tdrestmp, *reptimetmp, *cohctmp, *cihctmp, *speciestmp;
     double *ihcout;
    
@@ -163,7 +163,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	/* Create an array for the return argument */
 	
     outsize[0] = 1;
-	outsize[1] = totalstim*nrep;
+	outsize[1] = totalstim*(nrep);
     
 	plhs[0] = mxCreateNumericArray(2, outsize, mxDOUBLE_CLASS, mxREAL);
 	
