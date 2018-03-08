@@ -60,7 +60,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	
 	double *px, cf, tdres, fibertype, noiseType, implnt;
-	int    nrep, pxbins, lp, outsize[2], totalstim;
+	long    nrep, pxbins, lp, outsize[2], totalstim;
 
 	double *pxtmp, *cftmp, *nreptmp, *tdrestmp, *fibertypetmp, *noiseTypetmp, *implnttmp;
         
