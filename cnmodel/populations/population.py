@@ -31,6 +31,7 @@ class Population(object):
         self._post_connections = []  # populations this one connects to
         self._pre_connections = []  # populations connecting to this one
         self._synapsetype = synapsetype
+        #self._ihcfreqs = ihcfreqs
         # numpy record array with information about each cell in the 
         # population
         fields = [
@@ -215,7 +216,7 @@ class Population(object):
         return freqs
     
   
-    def _get_cf_array(self, species, sgc_freq_reduce=False):
+    def _get_cf_array(self, species):
         """Return the array of CF values that should be used when instantiating
         this population. 
         
@@ -226,20 +227,22 @@ class Population(object):
         fmax = data.get('populations', species=species, cell_type=self.type, field='cf_max')
         
         freqs =self.getfreq(fmin, fmax, size)
-        # s = (fmax / fmin) ** (1./size)
-        # freqs = fmin * s**np.arange(size)
-        
-        # although there are ~10000 SGCs in a mouse (for example), there are only about 725
-        # IHCs. Therefore there are only 725 "frequency channels" to consider. 
-        # Here, we reassign the SGCs uniformly to the IHCs with the closest frequency
-        #
-        if self.type == 'sgc' and sgc_freq_reduce:
+
+        if self.type == 'sgc' and self._ihcfreqs:
+            # although there are ~9800 SGCs in a mouse (Ehret, 1979), there are only about 725
+            # IHCs (Ehret and Frankenreiter, 1977). A similar divergence occurs in other
+            # species.  Therefore, in mouse there are only 725 "frequency channels" to consider.
+            # Here, we reassign the SGC CFs to the IHCs with the closest frequency, and this
+            # assignment has a uniform density across frequency.
+            # In the future, the reassignment should be corrected by density across frequency
+            # note that original model behavior will occur if self._ihcfreqs is false in 
+            # the instantiation of the SGC population
             nIHC = data.get('populations', species=species, cell_type='ihc', field='n_cells')
             freqIHC = self.getfreq(fmin, fmax, nIHC)
             j = 1
-            for i in range(size):  # there is probably a more elegant way to do this
-                if j > nIHC-1:      # but for now, we do this once per instantation of a network...
-                    j = nIHC-1
+            for i in range(size):   # there is probably a more elegant way to do this
+                if j > nIHC-1:      # but for now, we do this once per instantation of a network
+                    j = nIHC-1      # so a straightforward assignment is sufficient
                 if freqs[i] < freqIHC[j]:
                     freqs[i] = freqIHC[j-1]
                 else:
@@ -248,7 +251,7 @@ class Population(object):
                         freqs[i] = freqIHC[j-1]
                     else:
                         freqs[i] = freqIHC[-1]            
-          
+
         # Cut off at 40kHz because the auditory nerve model only goes that far :(
         freqs = freqs[freqs<=40e3]
         

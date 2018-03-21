@@ -7,12 +7,16 @@ add_table_data('populations', row_key='field', col_key='cell_type',
 ----------------------------------------------------------------------------------------------------------
            ihc        sgc        bushy      tstellate    dstellate     octopus     pyramidal   tuberculoventral
                                                                                                 
-n_cells    725 [4]    10000 [1]  6500 [2]   6500 [2]     650 [3]       5000        3000        5000   
-cf_min     2000       2000       2000       2000         2000          2000        2000        2000   
+n_cells    725 [4]    9780  [1]  6500 [2]   6500 [2]     650 [3]       5000        3000        5000   
+cf_min     250        250        250        250          250           250         250         250    
 cf_max     90000      90000      90000      90000        90000         90000       90000       90000
 ----------------------------------------------------------------------------------------------------------
 
-[1] ?
+[1] Ehret, G. Quantative analysis of Nerve fiber Densities in the cohclear of the House Mouse (Mus musculus)
+    J. Comp. Neurol. 183: 73-88, 1979.
+    Total number of fibers 12578; IHC: 9780, OHC only = 703, Efferents 1867
+    NMRI mice 4-10 weeks old.
+    For future reference, Ehret cites Gacek and Rasmussen 1961 for total numbers in guinea pig and cat.
 
 [2] Rough estimate from allen brain atlas data:
     Volume of VCN is 0.377 mm^3, by counting voxels with 'VCO' (101) label in Common Coordinate Framework atlas.
