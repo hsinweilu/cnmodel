@@ -177,12 +177,12 @@ class BushyRothman(Bushy):
 
         self.spike_threshold = -40
         self.vrange = [-70., -55.]  # set a default vrange for searching for rmp
-        print 'model type, species: ', modelType, species, nach
+         # print 'model type, species: ', modelType, species, nach
         if morphology is None:
             """
             instantiate a basic soma-only ("point") model
             """
-            print "<< Bushy model: Creating point cell >>"
+            # print "<< Bushy model: Creating point cell >>"
             soma = h.Section(name="Bushy_Soma_%x" % id(self))  # one compartment of about 29000 um2
             soma.nseg = 1
             self.add_section(soma, 'soma')
@@ -191,7 +191,7 @@ class BushyRothman(Bushy):
             instantiate a structured model with the morphology as specified by 
             the morphology file
             """
-            print "<< Bushy model: Creating cell with morphology from %s >>" % morphology
+            # print "<< Bushy model: Creating cell with morphology from %s >>" % morphology
             self.set_morphology(morphology_file=morphology)
 
         # decorate the morphology with ion channels
@@ -210,7 +210,7 @@ class BushyRothman(Bushy):
         self.save_all_mechs()  # save all mechanisms inserted, location and gbar values...
         self.get_mechs(self.soma)
         if debug:
-            print "   << Created cell >>"
+            print "   << Bushy cell model created >>"
 
     def get_cellpars(self, dataset, species='guineapig', celltype='II'):
         cellcap = data.get(dataset, species=species, cell_type=celltype,
@@ -267,7 +267,7 @@ class BushyRothman(Bushy):
             # so here we reset the default Q10's for conductance (g) to 1.0
             if celltype not in ['bushy-II', 'bushy-II-I']:
                 raise ValueError('\nCell type %s is not implemented for mouse bushy cells' % celltype)
-            print '  Setting conductances for mouse bushy cell (%s), Xie and Manis, 2013' % celltype
+            # print '  Setting conductances for mouse bushy cell (%s), Xie and Manis, 2013' % celltype
             dataset = 'XM13_channels'
             self.vrange = [-68., -55.]  # set a default vrange for searching for rmp
             self.i_test_range = {'pulse': (-1., 1., 0.05)}
@@ -286,7 +286,7 @@ class BushyRothman(Bushy):
             self.axonsf = 0.57
             
         elif species == 'guineapig':
-            print '  Setting conductances for guinea pig %s bushy cell, Rothman and Manis, 2003' % modelType
+            # print '  Setting conductances for guinea pig %s bushy cell, Rothman and Manis, 2003' % modelType
             self._valid_temperatures = (22., 38.)
             if self.status['temperature'] is None:
                 self.status['temperature'] = 22. 
@@ -382,7 +382,7 @@ class BushyRothman(Bushy):
                                ihbar=sf*pars.soma_ih_gbar/refarea,
                                leakbar=sf*pars.soma_leak_gbar/refarea,
                               )
-            print 'RM03 gbar:\n', self.gBar.show()
+            # print 'RM03 gbar:\n', self.gBar.show()
             
             self.channelMap = {
                 'axon': {'nacn': self.gBar.nabar, 'klt': self.gBar.kltbar, 'kht': self.gBar.khtbar, 'ihvcn': 0.,
@@ -425,7 +425,7 @@ class BushyRothman(Bushy):
                                ihbar=pars.soma_ih_gbar/refarea,
                                leakbar=pars.soma_leak_gbar/refarea,
                               )
-            print 'XM13 gbar:\n', self.gBar.show()
+            # print 'XM13 gbar:\n', self.gBar.show()
             self.channelMap = {
                 'axon': {'nav11': self.gBar.nabar*1, 'klt': self.gBar.kltbar * 1.0, 'kht': self.gBar.khtbar, 'ihvcn': 0.,
                          'leak': self.gBar.leakbar * 0.25},
@@ -464,7 +464,7 @@ class BushyRothman(Bushy):
                 self.status['temperature'] = 34.
             pars = self.get_cellpars(dataset, species=self.status['species'], celltype='bushy-II')
             refarea = 1e-3*pars.cap / self.c_m
-            print (pars.cap, pars.soma_kht_gbar, refarea)  # refarea should be about 30e-6
+            # print (pars.cap, pars.soma_kht_gbar, refarea)  # refarea should be about 30e-6
             
             self.gBar = Params(nabar=pars.soma_na_gbar/refarea, # 1000.0E-9/refarea,
                                khtbar=pars.soma_kht_gbar/refarea,
@@ -472,7 +472,7 @@ class BushyRothman(Bushy):
                                ihbar=pars.soma_ih_gbar/refarea,
                                leakbar=pars.soma_leak_gbar/refarea,
                               )
-            print 'mGBC gbar:\n', self.gBar.show()
+            # print 'mGBC gbar:\n', self.gBar.show()
             sodiumch = 'jsrna'
             self.channelMap = {
                 'axon': {sodiumch: self.gBar.nabar*1., 'klt': self.gBar.kltbar * 1.0, 'kht': self.gBar.khtbar, 'ihvcn': 0.,

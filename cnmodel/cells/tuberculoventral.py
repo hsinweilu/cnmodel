@@ -174,7 +174,6 @@ class Tuberculoventral(Tuberculoventral):
             """
             instantiate a basic soma-only ("point") model
             """
-            print "<< Tuberculoventral model: Creating point cell >>"
             soma = h.Section(name="Tuberculoventral_Soma_%x" % id(self))  # one compartment of about 29000 um2
             soma.nseg = 1
             self.add_section(soma, 'soma')
@@ -183,7 +182,6 @@ class Tuberculoventral(Tuberculoventral):
             instantiate a structured model with the morphology as specified by 
             the morphology file
             """
-            print "<< Tuberculoventral model: Creating structured cell >>"
             self.set_morphology(morphology_file=morphology)
 
         # decorate the morphology with ion channels

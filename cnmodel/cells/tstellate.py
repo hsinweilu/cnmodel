@@ -158,7 +158,6 @@ class TStellateRothman(TStellate):
             """
             instantiate a basic soma-only ("point") model
             """
-            print( "<< TStellate model: Creating point cell, type={:s} >>".format(modelType))
             soma = h.Section(name="TStellate_Soma_%x" % id(self))  # one compartment of about 29000 um2
             soma.nseg = 1
             self.add_section(soma, 'soma')
@@ -167,7 +166,6 @@ class TStellateRothman(TStellate):
             instantiate a structured model with the morphology as specified by 
             the morphology file
             """
-            print "<< TStellate: Creating cell with morphology = %s>>" % morphology
             self.set_morphology(morphology_file=morphology)
 
         # decorate the morphology with ion channels
@@ -186,7 +184,7 @@ class TStellateRothman(TStellate):
         self.save_all_mechs()  # save all mechanisms inserted, location and gbar values...
         self.get_mechs(self.soma)
         if debug:
-                print "<< T-stellate: JSR Stellate Type 1 cell model created >>"
+                print "<< T-stellate: cell model created >>"
 
     def get_cellpars(self, dataset, species='guineapig', celltype='I-c'):
         cellcap = data.get(dataset, species=species, cell_type=celltype,
