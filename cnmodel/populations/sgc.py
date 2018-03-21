@@ -18,8 +18,8 @@ class SGC(Population):
         # Completely fabricated cell distribution: uniform from 2kHz to 40kHz,
         # evenly divided between SR groups. We only go up to 40kHz because the
         # auditory periphery model does not support >40kHz.
+
         self._ihcfreqs = ihcfreqs
-        print('ihcfreqs: ', ihcfreqs)
         freqs = self._get_cf_array(species)
         fields = [
             ('cf', float),
