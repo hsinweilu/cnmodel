@@ -103,7 +103,7 @@ class Population(object):
         """
         return self._cells[index]['connections']
 
-    def resolve_inputs(self, depth=1):
+    def resolve_inputs(self, depth=1, verbose=False):
         """ For each _real_ cell in the population, select a set of 
         presynaptic partners from each connected population and generate a 
         synapse from each.
@@ -116,13 +116,15 @@ class Population(object):
         for i in self.unresolved_cells():
             # loop over all cells whose presynaptic inputs have not been resolved
             cell = self._cells[i]['cell']
-            logging.info("Resolving inputs for %s %d", self, i)
+            if verbose:
+                logging.info("Resolving inputs for %s %d", self, i)
             self._cells[i]['connections'] = {}
             
             # select cells from each population to connect to this cell
             for pop in self._pre_connections:
                 pre_cells = self.connect_pop_to_cell(pop, i)
-                logging.info("  connected %d cells from %s", len(pre_cells), pop)
+                if verbose:
+                    logging.info("  connected %d cells from %s", len(pre_cells), pop)
                 assert pre_cells is not None
                 self._cells[i]['connections'][pop] = pre_cells
             self._cells[i]['input_resolved'] = True
@@ -205,8 +207,15 @@ class Population(object):
         dist = {'cf': scipy.stats.lognorm(input_range, scale=cf)}
 
         return size, dist
+
+
+    def getfreq(self, fmin, fmax, n):
+        s = (fmax/fmin)**(1./n)
+        freqs = fmin * s**np.arange(n)
+        return freqs
     
-    def _get_cf_array(self, species):
+  
+    def _get_cf_array(self, species, sgc_freq_reduce=False):
         """Return the array of CF values that should be used when instantiating
         this population. 
         
@@ -215,9 +224,31 @@ class Population(object):
         size = data.get('populations', species=species, cell_type=self.type, field='n_cells')
         fmin = data.get('populations', species=species, cell_type=self.type, field='cf_min')
         fmax = data.get('populations', species=species, cell_type=self.type, field='cf_max')
-        s = (fmax / fmin) ** (1./size)
-        freqs = fmin * s**np.arange(size)
         
+        freqs =self.getfreq(fmin, fmax, size)
+        # s = (fmax / fmin) ** (1./size)
+        # freqs = fmin * s**np.arange(size)
+        
+        # although there are ~10000 SGCs in a mouse (for example), there are only about 725
+        # IHCs. Therefore there are only 725 "frequency channels" to consider. 
+        # Here, we reassign the SGCs uniformly to the IHCs with the closest frequency
+        #
+        if self.type == 'sgc' and sgc_freq_reduce:
+            nIHC = data.get('populations', species=species, cell_type='ihc', field='n_cells')
+            freqIHC = self.getfreq(fmin, fmax, nIHC)
+            j = 1
+            for i in range(size):  # there is probably a more elegant way to do this
+                if j > nIHC-1:      # but for now, we do this once per instantation of a network...
+                    j = nIHC-1
+                if freqs[i] < freqIHC[j]:
+                    freqs[i] = freqIHC[j-1]
+                else:
+                    j = j + 1
+                    if j < nIHC:
+                        freqs[i] = freqIHC[j-1]
+                    else:
+                        freqs[i] = freqIHC[-1]            
+          
         # Cut off at 40kHz because the auditory nerve model only goes that far :(
         freqs = freqs[freqs<=40e3]
         

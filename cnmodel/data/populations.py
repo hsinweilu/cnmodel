@@ -4,13 +4,13 @@ from ._db import add_table_data
 add_table_data('populations', row_key='field', col_key='cell_type', 
                species='mouse', data=u"""
 
------------------------------------------------------------------------------------------------------
-             sgc        bushy      tstellate    dstellate     octopus     pyramidal   tuberculoventral
-                                                                                           
-n_cells      10000 [1]  6500 [2]   6500 [2]     650 [3]       5000        3000        5000   
-cf_min       2000       2000       2000         2000          2000        2000        2000   
-cf_max       90000      90000      90000        90000         90000       90000       90000
------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
+           ihc        sgc        bushy      tstellate    dstellate     octopus     pyramidal   tuberculoventral
+                                                                                                
+n_cells    725 [4]    10000 [1]  6500 [2]   6500 [2]     650 [3]       5000        3000        5000   
+cf_min     2000       2000       2000       2000         2000          2000        2000        2000   
+cf_max     90000      90000      90000      90000        90000         90000       90000       90000
+----------------------------------------------------------------------------------------------------------
 
 [1] ?
 
@@ -29,4 +29,15 @@ cf_max       90000      90000      90000        90000         90000       90000 
     36 cells in 500x500 um = 144e6 / m^2  ~= 1728 / mm^2
     = 651 cells total  (VCN, unilateral)
 
+[4] Data from:
+    Ding, D., McFadden, S.L. and Salvi, R. Willot "Cochlear Hair Cell Densities and Inner-Ear Staining
+    Techniques" in : Willot, J.F. Ed. "Handbook of Mouse Auditory Research". CRC Press, 2001. 
+    Table 13.6 (p192), CBA = 725  (other strains in similar range)
+    
+    A similar number comes from Ehret, G. and Frankenreiter, M. "Quantitative Analysis of Cochlear Structures
+    in the House Mouse in Relation to Mechanisms of Acoustical Information Processing". J. Comp. Physiol. A.
+    122: 65-85, 1977.
+    NMRI strain, 6-8 weeks old: IHC count = 765.
 """)
+
+
