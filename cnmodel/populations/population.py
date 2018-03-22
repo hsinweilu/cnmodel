@@ -220,7 +220,7 @@ class Population(object):
         """Return the array of CF values that should be used when instantiating
         this population. 
         
-        Commonly used by subclasses durin initialization.
+        Commonly used by subclasses during initialization.
         """
         size = data.get('populations', species=species, cell_type=self.type, field='n_cells')
         fmin = data.get('populations', species=species, cell_type=self.type, field='cf_min')

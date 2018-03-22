@@ -519,12 +519,12 @@ class ReadWavefile(Sound):
         print('fs: ', fs_wav)
         print('stim shape: ', stimulus.shape)
         maxt = 1.0
-        if stimulus.shape[1] > 1:
+        if len(stimulus.shape) > 1 and stimulus.shape[1] > 1:
             stimulus = stimulus[:,0]  # just use one channel
         if len(stimulus)/fs_wav > maxt:  # more than 0.5 seconds long... clip to 400 msec with 100 msec zeros at begin
             st = np.zeros(int(maxt*fs_wav)+1)
             st[int(0.1*fs_wav):int(maxt*fs_wav)] = stimulus[0:int((maxt-0.1)*fs_wav)]
-        stimulus = st
+            stimulus = st
         rms = np.sqrt(np.mean(stimulus**2.0))  # find rms of the waveform
         self.opts['duration'] = (stimulus.shape[0]-1)/float(fs_wav)  # recompute the duration.
         frate = 1./self.opts['rate']
