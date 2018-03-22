@@ -235,7 +235,7 @@ class TStellateRothman(TStellate):
             # model description in Xie and Manis 2013. Note that
             # conductances were not scaled for temperature (rates were)
             # so here we reset the default Q10's for conductance (g) to 1.0
-            print '  Setting Conductances for mouse I-c Tstellate cell, Xie and Manis, 2013'
+            # print '  Setting Conductances for mouse I-c Tstellate cell, Xie and Manis, 2013'
             self.c_m = 0.9  # default in units of F/cm^2
             dataset = 'XM13_channels'
             self.vrange = [-75., -55.]
@@ -264,7 +264,7 @@ class TStellateRothman(TStellate):
             
         elif species == 'guineapig':
             # and modelType == 'I-c':  # values from R&M 2003, Type I
-            print '  Setting Conductances for Guinea Pig I-c, Rothman and Manis, 2003'
+            # print '  Setting Conductances for Guinea Pig I-c, Rothman and Manis, 2003'
             dataset = 'RM03_channels'
             self.c_m = 0.9  # default in units of F/cm^2
             self.vrange = [-75., -55.]
