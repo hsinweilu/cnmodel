@@ -97,7 +97,7 @@ class Tuberculoventral(Cell):
             elif post_cell.type == 'pyramidal':
                 nzones, delay = 5, 0
             else:
-                raise NotImplementedError("No knowledge as to how to connect DStellate to cell type %s" %
+                raise NotImplementedError("No knowledge as to how to connect tuberculoventral to cell type %s" %
                                         type(post_cell))
             
             pre_sec = self.soma

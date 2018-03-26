@@ -8,7 +8,7 @@ add_table_data('populations', row_key='field', col_key='cell_type',
            ihc        sgc        bushy      tstellate    dstellate     octopus     pyramidal   tuberculoventral
                                                                                                 
 n_cells    725 [4]    9780  [1]  6500 [2]   6500 [2]     650 [3]       5000        3000        5000   
-cf_min     250        250        250        250          250           250         250         250    
+cf_min     2000       2000       2000       2000         2000          2000        2000        2000   
 cf_max     90000      90000      90000      90000        90000         90000       90000       90000
 ----------------------------------------------------------------------------------------------------------
 
