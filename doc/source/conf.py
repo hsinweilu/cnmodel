@@ -29,7 +29,8 @@ class Mock(MagicMock):
         return MagicMock()
 
 MOCK_MODULES = ['numpy', 'scipy', 'pyqtgraph', 'matplotlib', 'neuron', 'argparse',
-        'numpy.ma', 'scipy.stats', 'scipy.optimize', 'scipy.integrate', 'sys.path']
+        'numpy.ma', 'scipy.stats', 'scipy.optimize', 'scipy.integrate', 'sys.path',
+        'lmfit', 'matplotlib.pyplot', 'pyqtgraph.multiprocess']
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 
