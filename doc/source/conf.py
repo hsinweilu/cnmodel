@@ -30,11 +30,11 @@ class Mock(MagicMock):
 
 MOCK_MODULES = ['numpy', 'numpy.ma', 
                 'scipy', 'scipy.stats', 'scipy.io', 'scipy.optimize', 'scipy.integrate', 
-                    'scipy.io.wavfile',
-                'pyqtgraph', 'pyqtgraph.Qt', 'pyqgtraph.exporters', 'pyqtgraph.multiprocess',
+                    'scipy.io.wavfile', 'scipy.signal',
+                'pyqtgraph', 'pyqtgraph.Qt', 'pyqtgraph.exporters', 'pyqtgraph.multiprocess',
                 'matplotlib', 'matplotlib.pyplot',
                 'argparse','sys.path',
-                'neuron', 'lmfit', 'resampy']
+                'neuron', 'cochlea', 'lmfit', 'resampy']
         
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
