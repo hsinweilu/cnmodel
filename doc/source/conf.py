@@ -28,11 +28,14 @@ class Mock(MagicMock):
     def __getattr__(cls, name):
         return MagicMock()
 
-MOCK_MODULES = ['numpy', 'scipy', 'pyqtgraph', 'pyqtgraph.Qt', 
-        'matplotlib', 'neuron', 'argparse',
-        'numpy.ma', 'scipy.stats', 'scipy.io', 'scipy.optimize', 'scipy.integrate', 'scipy.io.wavfile',
-        'sys.path',
-        'lmfit', 'matplotlib.pyplot', 'pyqtgraph.multiprocess']
+MOCK_MODULES = ['numpy', 'numpy.ma', 
+                'scipy', 'scipy.stats', 'scipy.io', 'scipy.optimize', 'scipy.integrate', 
+                    'scipy.io.wavfile',
+                'pyqtgraph', 'pyqtgraph.Qt', 'pyqgtraph.exporters', 'pyqtgraph.multiprocess',
+                'matplotlib', 'matplotlib.pyplot',
+                'argparse','sys.path',
+                'neuron', 'lmfit', 'resampy']
+        
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 
